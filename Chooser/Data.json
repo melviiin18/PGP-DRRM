@@ -45,9 +45,9 @@
         tooltip: 'On the 26th of September 2009, Tropical Storm Ketsana intensified into a typhoon, which locals call typhoon Ondoy. Typhoon Ondoy struck the Philippines lashing central Luzon, including the national capital of Manila, at one point covering over 80% in water.'				
     },
 	{
-        name: 'Ground Shaking',
+        name: 'Ground shaking</br>hazard-GMMA',
         thumb: 'GroundShaking.png',
-        url: 'ready_groundshaking',
+        url: 'gmma_ground_shaking',
         tooltip: ''				
     },
 	
