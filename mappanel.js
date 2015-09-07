@@ -201,7 +201,7 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[1]);
-							//this.up().up().up().items.items[6].setText('Basemap : ' + this.text);				
+							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);				
 							//OthoExtent = new OpenLayers.Bounds(120.613472,14.295979, 121.550385,14.827789).transform('EPSG:4326','EPSG:900913')
 							//map.zoomToExtent(OthoExtent);	
 							
