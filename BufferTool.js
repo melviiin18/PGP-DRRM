@@ -50,7 +50,7 @@ Ext.define('BufferTool', {
 			}
 		}
 		
-		//OpenLayers.ProxyHost="/webapi/get.ashx?url=" 	 
+		OpenLayers.ProxyHost="/webapi/get.ashx?url=" 	 
 		console.log(OpenLayers.ProxyHost);
 		var displayLayer = me.vectorLayer;
 		var localS = 'geoserver.namria.gov.ph/geoserver/wps'						
@@ -59,7 +59,8 @@ Ext.define('BufferTool', {
 				//local: 'http://202.90.149.232/geoserver/wps'
 				//local: 'http://192.168.254.12:3000/geoserver.namria.gov.ph/geoserver/wps'
 				//local: 'http://192.168.8.20:8080/geoserver/wps'
-				local:"/webapi/get.ashx?url=www.geoserver.namria.gov.ph/geoserver/wps"  
+				//local:"/webapi/get.ashx?url=www.geoserver.namria.gov.ph/geoserver/wps"  
+				local:"http://192.168.254.111/geoserver/wps"  
 			}
 		});
 		

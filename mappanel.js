@@ -86,8 +86,8 @@ Ext.define('mappanel',{
 				handler:function(){					
 					var me=this.up('panel');			
 					console.log(me);
-					if(me.map.getLayersByName('Gcode').length > 0) {				
-						me.map.getLayersByName('Gcode')[0].destroy();					
+					if(map.getLayersByName('Gcode').length > 0) {				
+						map.getLayersByName('Gcode')[0].destroy();					
 					};		
 					
 					if (navigator.geolocation) {   
@@ -107,8 +107,8 @@ Ext.define('mappanel',{
 										
 									});		
 								Location.addFeatures([new OpenLayers.Feature.Vector(currLoc)]);						
-								me.map.addLayers([Location]);												
-								me.map.zoomToExtent(Location.getDataExtent());		
+								map.addLayers([Location]);												
+								map.zoomToExtent(Location.getDataExtent());		
 								}
 						)		
 						
@@ -159,7 +159,7 @@ Ext.define('mappanel',{
 					var me = this.up().up();
 						console.log(me);						
 					var win = Ext.create('BufferTool', {
-						map:me.map
+						map:map
 					})					
 					win.show();					
 					
@@ -548,8 +548,9 @@ Ext.define('mappanel',{
 			map:map,
 			dockedItems: [
 				{ xtype: 'toolbar',
-				  dock: 'top',
+				  dock: 'top',				  
 				  items: this.buildItems(),
+				  enableOverflow: true
 				}
 			]			
 		});		
