@@ -9,6 +9,7 @@ Ext.define('mappanel',{
 	width:100,
 	height:100,
 	selLayer:'',
+	pgsGetFeatureInfo:'',
 	execUrl:function(url, callback){
 		Ext.Ajax.request({
 				url:url,
@@ -35,13 +36,110 @@ Ext.define('mappanel',{
 			},
 	
 	buildItems:function(){
-		return[			
+		var items = [];
+		var me=this;		
+		
+		
+		// zoom in
+		items.push(
+			Ext.create('Ext.button.Button', Ext.create('GeoExt.Action', {
+				control: new OpenLayers.Control.ZoomBox(),
+				id: 'btnZoomIn',
+				map: map,
+				iconCls: 'add',
+				iconAlign: 'top',
+				icon: 'img/zoom_in.png',
+				scale: 'large',
+				width: 25, 
+				height: 25,
+				toggleGroup: 'navigation',
+				allowDepress: false,
+				tooltip: 'Zoom in',
+				handler: function() {
+				  if (navigator.appName == "Microsoft Internet Explorer") {
+					me.body.applyStyles('cursor:url("img/zoom_in.cur")');
+				  }
+				  else {
+					me.body.applyStyles('cursor:crosshair');
+				  }
+				}
+			}))
+		);
+		
+		
+		// zoom out
+		items.push(
+			Ext.create('Ext.button.Button', Ext.create('GeoExt.Action', {
+				control: new OpenLayers.Control.ZoomBox({out: true}),
+				id: 'btnZoomOut',
+				map: map,
+				iconCls: 'add',
+				iconAlign: 'top',
+				icon: 'img/zoom_out.png',
+				toggleGroup: 'navigation',
+				tooltip: 'Zoom out',
+				scale: 'large',
+				width: 25, 
+				height: 25,
+				handler: function() {				
+					
+				  if (navigator.appName == "Microsoft Internet Explorer") {
+					me.body.applyStyles('cursor:url("img/zoom_in.cur")');
+				  }
+				  else {
+					me.body.applyStyles('cursor:crosshair');
+				  }
+				}
+			}))
+		);
+		
+		
+		// pan
+		items.push(
+			Ext.create('Ext.button.Button', Ext.create('GeoExt.Action', {
+				control: new OpenLayers.Control.DragPan(),
+				id: 'btnPan',
+				map: map,
+				iconCls: 'add',
+				iconAlign: 'top',
+				icon: 'img/identify.png',
+				scale: 'large',
+				width: 25, 
+				height: 25,
+				toggleGroup: 'navigation',
+				tooltip: 'Pan/Identify',
+				pressed: true,
+				handler: function() {					
+					me.body.applyStyles('cursor:default');
+				},
+				listeners: {
+					toggle: function(e){
+						if(e.pressed) {
+							//info.activate();							
+							this.up('panel').pgsGetFeatureInfo.activate();
+						} else {
+							//info.deactivate();							
+							this.up('panel').pgsGetFeatureInfo.deactivate();							
+						} 
+					}
+				}
+			}))
+		);
+		
+		
+		//search field
+		items.push(
 			{
-				xtype:'textfield',
+				xtype:'textfield',									
 				itemId:'Search',
 				width:200,
 				emptyText:'Location Search',
-			},{
+			}
+		);
+		
+		//Go button		
+		items.push(
+			{
 				xtype:'button',
 				text:'Go',
 				itemId:'btnGo',
@@ -49,31 +147,40 @@ Ext.define('mappanel',{
 				handler:function(){								
 					var me=this.up();				
 					var findThis = (me.getComponent('Search').getValue());					
-					var me=this.up().up();					
-					if  (me.map.getLayersByName('My Location').length > 0) {				
-						me.map.getLayersByName('My Location')[0].destroy();					
-					};	 				
-					
-					me.gCode(findThis, function(coord){					
-						if  (me.map.getLayersByName('Gcode').length > 0) {				
-							me.map.getLayersByName('Gcode')[0].destroy();					
-						};		 				
-						var currLoc = new OpenLayers.Geometry.Point(coord.a,coord.b).transform('EPSG:4326','EPSG:900913');
-						var Location = new OpenLayers.Layer.Vector(	'Gcode', {
-								 styleMap: new OpenLayers.StyleMap({'default':{										
-										externalGraphic: "./chooser/icons/marker.png",				
-										graphicYOffset: -25,
-										graphicHeight: 35,
-										graphicTitle: findThis
-								}}), 	
-								displayInLayerSwitcher: false,		
-						});							
-						Location.addFeatures([new OpenLayers.Feature.Vector(currLoc)]);						
-						me.map.addLayer(Location);						
-						me.map.zoomToExtent(Location.getDataExtent());			 		
-					})						
-				}			
-			},			
+					if (findThis){
+						var me=this.up().up();					
+						if  (me.map.getLayersByName('My Location').length > 0) {				
+							me.map.getLayersByName('My Location')[0].destroy();					
+						};	 				
+						
+						me.gCode(findThis, function(coord){					
+							if  (me.map.getLayersByName('Gcode').length > 0) {				
+								me.map.getLayersByName('Gcode')[0].destroy();					
+							};		 				
+							var currLoc = new OpenLayers.Geometry.Point(coord.a,coord.b).transform('EPSG:4326','EPSG:900913');
+							var Location = new OpenLayers.Layer.Vector(	'Gcode', {
+									 styleMap: new OpenLayers.StyleMap({'default':{										
+											externalGraphic: "./chooser/icons/marker.png",				
+											graphicYOffset: -25,
+											graphicHeight: 35,
+											graphicTitle: findThis
+									}}), 	
+									displayInLayerSwitcher: false,		
+							});							
+							Location.addFeatures([new OpenLayers.Feature.Vector(currLoc)]);						
+							me.map.addLayer(Location);						
+							me.map.zoomToExtent(Location.getDataExtent());			 		
+						})	
+					}else{
+						Ext.Msg.alert('Message', 'Please enter a location');
+					}	
+				}	
+			}		
+		
+		);
+		
+		//Get current location button
+		items.push(
 			{	
 				xtype:'button',
 				tooltip:'My current location',
@@ -84,8 +191,7 @@ Ext.define('mappanel',{
 				width:25,
 				height:25,	
 				handler:function(){					
-					var me=this.up('panel');			
-					console.log(me);
+					var me=this.up('panel');								
 					if(map.getLayersByName('Gcode').length > 0) {				
 						map.getLayersByName('Gcode')[0].destroy();					
 					};		
@@ -94,8 +200,7 @@ Ext.define('mappanel',{
 						/** Overlay current location*/		
 						navigator.geolocation.getCurrentPosition(
 							function(position){					
-								var currLoc = new OpenLayers.Geometry.Point(position.coords.longitude,position.coords.latitude).transform('EPSG:4326', 'EPSG:900913');
-								console.log('myloc--',currLoc);
+								var currLoc = new OpenLayers.Geometry.Point(position.coords.longitude,position.coords.latitude).transform('EPSG:4326', 'EPSG:900913');								
 								var Location = new OpenLayers.Layer.Vector(	'My Location', {
 										styleMap: new OpenLayers.StyleMap({'default':{
 												externalGraphic: "./chooser/icons/MyLocation.png",				
@@ -116,7 +221,11 @@ Ext.define('mappanel',{
 						console.log("Geolocation is not supported by this browser.");
 					}						
 				}		
-			},
+			}
+		);
+		
+		//full extent
+		items.push(
 			{			
 				xtype:'button',
 				tooltip:'Full extent',
@@ -125,7 +234,7 @@ Ext.define('mappanel',{
 				width:25,
 				height:25,
 				handler:function(){
-					var me=this.up().up();				
+					var me=this.up().up();									
 					OthoExtent = new OpenLayers.Bounds(120.613472,14.295979, 121.550385,14.827789).transform('EPSG:4326','EPSG:900913')
 					
 					var lonlat = new OpenLayers.LonLat(121,14).transform(new OpenLayers.Projection("EPSG:4326"),new OpenLayers.Projection("EPSG:900913"));
@@ -142,39 +251,50 @@ Ext.define('mappanel',{
 						map.zoomToExtent(OthoExtent);
 					else
 						map.zoomTo(1);
-						
 				}
-					//
-					
-					
-					
-			},{
+			}
+		);
+		
+		items.push(
+			{
 				xtype:'button',
 				tooltip:'Buffer tool',
 				icon:'./chooser/icons/buffer.png',
-				scale:'medium',
+				scale:'large',
 				width:25,
 				height:25,
 				handler:function(){
-					var me = this.up().up();
-						console.log(me);						
-					var win = Ext.create('BufferTool', {
-						map:map
-					})					
-					win.show();					
+					var me = this.up().up();				
+					//console.log(Ext.WindowManager.getActive())
+					if(!Ext.getCmp('bufferWindow')){
+						var me = this.up().up();
+						var win = Ext.create('BufferTool', {
+							map:map,
+							id:'bufferWindow',
+						})					
+						win.show();				
+					}	
 					
 				}
-			},
-			'->',
+			}
+		)
 		
-			{
-				//xtype:'label',
-				
-				xtype:'tbtext',
-				text: 'Basemap: NAMRIA Basemaps'
-				
-			},
+		items.push(
 			'->',
+			{
+				xtype:'tbtext',
+				itemId:'basemapLabel',
+				text: 'Basemap: NAMRIA Basemaps'
+			
+			},
+			'->'
+		)
+		
+
+		
+		//switch basemap
+		items.push(					
+			
 			{
 				xtype:'button',
 				scale:'large',
@@ -185,13 +305,12 @@ Ext.define('mappanel',{
 				tooltip:'Switch basemap',
 				menu     : [
 					{
-						text: 'Philippine Geoportal',
+						text: 'NAMRIA Basemaps',
 						group: 'basemap',
 						checked: true,
 						handler: function(){
 							map.setBaseLayer(map.layers[0]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);
-							
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);													
 						}
 					},
 					{
@@ -201,9 +320,7 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[1]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);				
-							//OthoExtent = new OpenLayers.Bounds(120.613472,14.295979, 121.550385,14.827789).transform('EPSG:4326','EPSG:900913')
-							//map.zoomToExtent(OthoExtent);	
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);
 							
 						}
 					},
@@ -214,7 +331,7 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[2]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);
 							
 						}
 					},
@@ -225,7 +342,7 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[3]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);
 						}
 					},
 					{
@@ -234,7 +351,7 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[4]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);
 						}
 					},
 					{
@@ -243,10 +360,9 @@ Ext.define('mappanel',{
 						checked: false,
 						handler: function(){
 							map.setBaseLayer(map.layers[5]);
-							this.up().up().up().items.items[6].setText('Basemap : ' + this.text);
+							this.up('toolbar').getComponent('basemapLabel').setText('Basemap : ' + this.text);
 						}
 					},
-						
 					'-',
 					{
 						text: '&nbsp &nbsp &nbsp &nbsp<b>NOTE:</b><br/>&nbsp &nbsp &nbsp &nbspWE HAVE OBSERVED SOME DISCREPANCIES <br/>&nbsp &nbsp &nbsp &nbspBY AS MUCH AS 10 METERS WHEN USING BASEMAPS<br/>&nbsp &nbsp &nbsp &nbspOTHER THAN THE NAMRIA BASEMAPS AND<br/>&nbsp &nbsp &nbsp &nbspORTHO IMAGE 2011-METRO MANILA.  USERS ARE <br/>&nbsp &nbsp &nbsp &nbspADVISED TO TAKE THE NECESSARY PRECAUTIONS<br/>&nbsp &nbsp &nbsp &nbspESPECIALLY WHEN VIEWING THE ACTIVE FAULTS<br/>&nbsp &nbsp &nbsp &nbsp(VALLEY FAULT SYSTEM) USING OTHER BASEMAPS.',
@@ -255,7 +371,8 @@ Ext.define('mappanel',{
 			   ]
 				
 			}
-		]	
+		)
+		return items;
 	},
 	
 	
@@ -266,8 +383,7 @@ Ext.define('mappanel',{
 		map = new OpenLayers.Map(				
 				{ 
 				controls: [
-					new OpenLayers.Control.Navigation(),					
-					new OpenLayers.Control.Zoom(),
+					new OpenLayers.Control.Navigation(),										
 					new OpenLayers.Control.MousePosition(),				
 				],
 				
@@ -498,7 +614,7 @@ Ext.define('mappanel',{
 		
 		
 		
-			var pgsGetFeatureInfo = new OpenLayers.Control.PGSGetFeatureInfo({
+			this.pgsGetFeatureInfo = new OpenLayers.Control.PGSGetFeatureInfo({
 				eventListeners: {
 					'getfeatureinfo' : function(e){
 					
@@ -537,8 +653,8 @@ Ext.define('mappanel',{
 					}
 				}
 		});
-		map.addControl(pgsGetFeatureInfo);
-		pgsGetFeatureInfo.activate();
+		map.addControl(this.pgsGetFeatureInfo);
+		this.pgsGetFeatureInfo.activate();
 		
 		//
 		
