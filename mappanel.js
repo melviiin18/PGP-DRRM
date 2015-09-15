@@ -277,7 +277,30 @@ Ext.define('mappanel',{
 					
 				}
 			}
-		)
+		);
+		//measure tool
+		items.push(
+			{
+				xtype:'button',
+				tooltip:'Measure tool',
+				icon:'./img/measure.png',
+				scale:'large',
+				width:25,
+				height:25,
+				handler:function(){
+					var me = this.up().up();				
+					//console.log(Ext.WindowManager.getActive())
+					if(!Ext.getCmp('measureToolWindow')){
+						var win = Ext.create('MeasureTool', {
+							map:me.map,	
+							id: 'measureToolWindow'		
+						})					
+						win.show();					
+					}	
+					
+				}
+			}
+		);
 		
 		items.push(
 			'->',
@@ -561,9 +584,7 @@ Ext.define('mappanel',{
 				
 				var retVal;
 				
-				// temporary fix 24 SEP 2014 ghelo
-				//url = url.replace('geoserver.namria.gov.ph','202.90.149.232');
-				//
+				
 				console.log(url);
 
 				
