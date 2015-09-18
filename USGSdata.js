@@ -30,12 +30,12 @@ Ext.define('USGSdata',{
 					}
 					
 					//url = 'http://202.90.149.231:8000/earthquake.usgs.gov/earthquakes/feed/v1.0/' + url 
-					url='/webapi/get.ashx?url=http://earthquake.usgs.gov/earthquakes/feed/v1.0/' + url
-					console.log('url-------', url);	
+					url='/webapi/get.ashx?url=http://earthquake.usgs.gov/earthquakes/feed/v1.0/' + url					
+					
 					if (map.getLayersByName('Earthquakes (USGS)').length>0)	{
 						map.getLayersByName('Earthquakes (USGS)')[0].destroy();		
-					}
-		
+					}															
+				
 					var usgs = new OpenLayers.Layer.Vector("Earthquakes (USGS)", {
 						projection: new OpenLayers.Projection("EPSG:4326"),
 						strategies: [new OpenLayers.Strategy.Fixed()],
@@ -49,8 +49,8 @@ Ext.define('USGSdata',{
 							graphicHeight: 20,
 							
 						}}) ,
-					});					
-					//
+					});								
+
 					selectctrl = new OpenLayers.Control.SelectFeature(
 					usgs,
 						{
@@ -93,10 +93,36 @@ Ext.define('USGSdata',{
 						popup.show();  
 						}
 					});
+																																			
+					//add loading message								
+					function loadstart() {
+						Ext.MessageBox.show({
+							msg:'Loading USGS earthquake data please wait...',
+							width:'300',
+							height:'150',
+							wait:true,
+							//waitConfig:{interval:500}					
+						});
+						console.log('layer 2 loaded') 														
+					}		
+						
+					
+					usgs.events.register("loadstart", this,loadstart);									
+					
+					usgs.events.register("loadend",this, function() { 
+							Ext.MessageBox.hide()																					
+					});																	
 					//
-					console.log(usgs);
-					me.mappanel.map.addLayer(usgs);					
-					me.close()					
+					
+					
+					me.mappanel.map.addLayer(usgs);										
+					me.close();
+
+					
+
+					
+					
+
 				
 				}	
 			},
