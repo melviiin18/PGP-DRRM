@@ -60,7 +60,8 @@ Ext.define('BufferTool', {
 				//local: 'http://192.168.254.12:3000/geoserver.namria.gov.ph/geoserver/wps'
 				//local: 'http://192.168.8.20:8080/geoserver/wps'
 				//local:"/webapi/get.ashx?url=www.geoserver.namria.gov.ph/geoserver/wps"  
-				local:"http://192.168.254.111/geoserver/wps"  
+				//local:"http://192.168.254.112/geoserver/wps"  
+				local: 'http://geoserver.namria.gov.ph/geoserver/wps'
 			}
 		});
 		

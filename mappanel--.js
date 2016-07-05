@@ -251,7 +251,7 @@ Ext.define('mappanel',{
 					else if (map.baseLayer.name=="Ortho Image 2011 - Metro Manila")	
 						map.zoomToExtent(OthoExtent);
 					else
-						map.zoomTo(6);
+						map.zoomTo(1);
 				}
 			}
 		);
@@ -440,8 +440,7 @@ Ext.define('mappanel',{
 		//
 		
 		
-	   //PGP Basemap	
-	  /*
+	   //PGP Basemap			
       var pgp_basemap_cache = new OpenLayers.Layer.NAMRIA(
 				'NAMRIA Basemap',
 				'http://202.90.149.252/ArcGIS/rest/services/Basemap/PGS_Basemap/MapServer',
@@ -450,24 +449,6 @@ Ext.define('mappanel',{
 					displayInLayerSwitcher: false,				
 				}
 		);
-		*/
-		
-		var pgp_basemap_cache = new OpenLayers.Layer.XYZ(					//Use NAMRIA Basemap Tiles
-					'NAMRIA Basemaps',
-					'http://192.168.8.26/tiles/v2/PGP/${z}/${x}/${y}.png',
-					{
-						isBaseLayer: true,						
-						sphericalMercator:true,					
-						transitionEffect: "resize",								
-						tileOrigin: tileOrigin,
-						displayInLayerSwitcher: false  
-						
-			
-				}
-			);
-			
-		map.addLayer(pgp_basemap_cache);
-		
 		
 		//Ortho
 		var pgp_ortho_mm_cache = new OpenLayers.Layer.ArcGISCache( "Ortho Image 2011 - Metro Manila",
@@ -554,7 +535,7 @@ Ext.define('mappanel',{
 		
 		
 		map.addLayers([pgp_basemap_cache,pgp_ortho_mm_cache,bing_aerial, arcgis_world_imagery, osm, google_satellite, Location, Location2]);		
-				
+		map.zoomToMaxExtent()		
 		
 		//new identify feature 
 			OpenLayers.Control.PGSGetFeatureInfo = OpenLayers.Class(OpenLayers.Control, {                
@@ -709,9 +690,7 @@ Ext.define('mappanel',{
 				  items: this.buildItems(),
 				  enableOverflow: true
 				}
-			],
-			center: new OpenLayers.LonLat(13610082.099764,1403622.1394924),
-			zoom:6					
+			]			
 		});		
 		this.callParent();   
     }	
